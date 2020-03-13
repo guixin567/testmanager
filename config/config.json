@@ -1,0 +1,6 @@
+{
+  "app_name":"food manager",
+  "port":":8080",
+  "static_path":"/manager/static",
+  "model":"dev"
+}
