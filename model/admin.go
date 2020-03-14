@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Admin struct {
 	AdminId    int       `xorm:"pk autoincr" json:"id"`
