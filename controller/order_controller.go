@@ -8,13 +8,13 @@ import (
 	"test1/util"
 )
 
-type UserController struct {
+type OrderController struct {
 	Context iris.Context
-	Service service.UserService
+	Service service.OrderService
 	Session sessions.Session
 }
 
-func (controller *UserController) GetCount() mvc.Result {
+func (controller *OrderController) GetCount() mvc.Result {
 	count, err := controller.Service.GetCount()
 	if err != nil {
 		return mvc.Response{
@@ -24,9 +24,10 @@ func (controller *UserController) GetCount() mvc.Result {
 			},
 		}
 	}
+
 	return mvc.Response{
 		Object: iris.Map{
-			"status": util.OK,
+			"status": util.FAIL,
 			"count":  count,
 		},
 	}

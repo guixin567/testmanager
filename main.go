@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-xorm/xorm"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/mvc"
@@ -46,20 +47,42 @@ func main() {
 				"code":    iris.StatusInternalServerError,
 			})
 	})
-	//6,MVC和Session配置
+	//6,获取session和engine
 	session := sessions.New(sessions.Config{})
 	engine := datasource.New()
-	//Admin登陆
+	//session和engine通过mvc绑定到controller
+	bind(engine, app, session)
+
+	//7,服务器，端口信息配置
+	initConfig := config.InitConfig()
+	_ = app.Run(iris.Addr(initConfig.Port))
+}
+
+//数据库，MVC
+//session和engine通过mvc绑定到controller
+func bind(engine *xorm.Engine, app *iris.Application, session *sessions.Sessions) {
+	//管理员登陆模块
 	adminService := service.GetAdminService(engine)
 	adminMVC := mvc.New(app.Party("/admin"))
 	adminMVC.Register(adminService, session.Start)
 	adminMVC.Handle(new(controller.AdminController))
 
-	//用户
-	userMVC := mvc.New(app.Party("/user"))
-	userMVC.Register(session.Start)
+	//用户模块
+	userService := service.GetUserService(engine)
+	userMVC := mvc.New(app.Party("/v1/users"))
+	userMVC.Register(userService, session.Start)
 	userMVC.Handle(new(controller.UserController))
-	//7,服务器，端口信息配置
-	initConfig := config.InitConfig()
-	_ = app.Run(iris.Addr(initConfig.Port))
+
+	//统计模块
+	statisticService := service.GetStatisticService(engine)
+	statisticMvc := mvc.New(app.Party("/statis/{type}/{data}"))
+	statisticMvc.Register(statisticService, session.Start)
+	statisticMvc.Handle(new(controller.StatisticController))
+
+	//订单模块
+	orderService := service.GetOrderService(engine)
+	orderMvc := mvc.New(app.Party("/bos/orders"))
+	orderMvc.Register(orderService, session.Start)
+	orderMvc.Handle(new(controller.OrderController))
+
 }
