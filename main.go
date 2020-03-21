@@ -10,6 +10,7 @@ import (
 	"test1/controller"
 	"test1/datasource"
 	"test1/service"
+	"time"
 )
 
 func main() {
@@ -48,8 +49,13 @@ func main() {
 			})
 	})
 	//6,获取session和engine
-	session := sessions.New(sessions.Config{})
+	session := sessions.New(sessions.Config{
+		Cookie:  "sessioncookie2",
+		Expires: 24 * time.Hour,
+	})
 	engine := datasource.New()
+	redis := datasource.NewRedis()
+	session.UseDatabase(redis)
 	//session和engine通过mvc绑定到controller
 	bind(engine, app, session)
 

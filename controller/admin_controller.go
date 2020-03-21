@@ -5,7 +5,6 @@ import (
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
 	"github.com/kataras/iris/sessions"
-	"test1/model"
 	"test1/service"
 	"test1/util"
 )
@@ -61,8 +60,8 @@ func (controller *AdminController) PostLogin() mvc.Result {
 			},
 		}
 	}
-	adminByte, _ := json.Marshal(admin)
-	controller.Session.Set(Admin, adminByte)
+	//adminByte, _ := json.Marshal(admin)
+	controller.Session.Set(Admin, admin.AdminId)
 	return mvc.Response{
 		Object: iris.Map{
 			"message": "登陆成功",
@@ -76,18 +75,19 @@ func (controller *AdminController) PostLogin() mvc.Result {
 //管理员用户信息查询
 //调用service里面的GetInfo查询数据库，并返回信息
 func (controller *AdminController) GetInfo() mvc.Result {
-	adminByte := controller.Session.Get(Admin)
-	if adminByte == nil {
-		return mvc.Response{
-			Object: iris.Map{
-				"status":  util.UnLogin,
-				"type":    util.ErrorUnLogin,
-				"message": util.GetCodeMessage(util.ErrorUnLogin),
-			},
-		}
-	}
-	var admin model.Admin
-	err := json.Unmarshal(adminByte.([]byte), &admin)
+	//adminByte := controller.Session.Get(Admin)
+	//if adminByte == nil {
+	//	return mvc.Response{
+	//		Object: iris.Map{
+	//			"status":  util.UnLogin,
+	//			"type":    util.ErrorUnLogin,
+	//			"message": util.GetCodeMessage(util.ErrorUnLogin),
+	//		},
+	//	}
+	//}
+	//var admin model.Admin
+	//err := json.Unmarshal(adminByte.([]byte), &admin)
+	adminId, err := controller.Session.GetInt64(Admin)
 	if err != nil {
 		return mvc.Response{
 			Object: iris.Map{
@@ -97,8 +97,12 @@ func (controller *AdminController) GetInfo() mvc.Result {
 			},
 		}
 	}
+	admin, err := controller.Service.GetAdminById(adminId)
+	adminJson, err := json.Marshal(admin)
 	var adminMap map[string]interface{}
-	err = json.Unmarshal(adminByte.([]byte), &adminMap)
+	err = json.Unmarshal(adminJson, &adminMap)
+	//var adminMap map[string]interface{}
+	//err = json.Unmarshal(adminByte.([]byte), &adminMap)
 	return mvc.Response{
 		Object: iris.Map{
 			"status": util.OK,

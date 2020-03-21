@@ -2,5 +2,19 @@
   "app_name":"food manager",
   "port":":8080",
   "static_path":"/manager/static",
-  "model":"dev"
+  "model":"dev",
+  "database": {
+    "driver": "mysql",
+    "port": "3306",
+    "user": "root",
+    "pwd": "12345678",
+    "dbname": "test1"
+  },
+  "redis": {
+    "network": "tcp",
+    "host": "127.0.0.1",
+    "port": "6379",
+    "password": "",
+    "prefix":"manager_"
+  }
 }

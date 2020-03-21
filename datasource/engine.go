@@ -3,12 +3,14 @@ package datasource
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"test1/config"
 	"test1/model"
 )
 
 // Database init
 func New() *xorm.Engine {
-	engine, err := xorm.NewEngine("mysql", "root:12345678@/test1?charset=utf8")
+	dataBase := config.InitConfig().DataBase
+	engine, err := xorm.NewEngine(dataBase.Driver, dataBase.User+":"+dataBase.Pwd+"@/"+dataBase.DBName+"?charset=utf8")
 	err = engine.Sync2(
 		new(model.Admin),
 		new(model.UserOrder),

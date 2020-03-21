@@ -13,13 +13,19 @@ import (
 //定义一个struct的controller，声明上下文,service,session
 //定义一个请求的方法
 
+const (
+	UserType  = "UserType"
+	OrderType = "OrderType"
+	AdminType = "AdminType"
+)
+
 //数据统计
 //新增用户，新增订单，新增管理员
 //上下文，Service,Session
 type StatisticController struct {
 	Context iris.Context
 	Service service.StatisticService
-	Session sessions.Session
+	Session *sessions.Session
 }
 
 //
@@ -45,13 +51,31 @@ func (controller *StatisticController) GetCount() mvc.Result {
 
 	switch requestType {
 	case "user":
-		result = controller.Service.GetUserCount(date)
+		userCount := controller.Session.Get(UserType + date)
+		if userCount != nil {
+			result = int64(userCount.(float64))
+		} else {
+			result = controller.Service.GetUserCount(date)
+			controller.Session.Set(UserType+date, result)
+		}
 
 	case "order":
-		result = controller.Service.GetOrderCount(date)
+		orderCount := controller.Session.Get(OrderType + date)
+		if orderCount != nil {
+			result = int64(orderCount.(float64))
+		} else {
+			result = controller.Service.GetOrderCount(date)
+			controller.Session.Set(OrderType+date, result)
+		}
 
 	case "admin":
-		result = controller.Service.GetAdminCount(date)
+		adminCount := controller.Session.Get(AdminType + date)
+		if adminCount != nil {
+			result = int64(adminCount.(float64))
+		} else {
+			result = controller.Service.GetAdminCount(date)
+			controller.Session.Set(AdminType+date, result)
+		}
 	}
 
 	return mvc.Response{
